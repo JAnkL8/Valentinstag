@@ -1000,5 +1000,37 @@
       }
     }, 2800);
   </script>
+  <script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+  const SUPABASE_URL = "https://DEIN-PROJEKT.supabase.co";
+  const SUPABASE_KEY = "DEIN_ANON_ODER_PUBLISHABLE_KEY";
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // einfache session id pro Gerät/Browser
+  const SESSION_KEY = "val_session_id";
+  const session_id = localStorage.getItem(SESSION_KEY) || crypto.randomUUID();
+  localStorage.setItem(SESSION_KEY, session_id);
+
+  async function saveResponse(kind, value){
+    try{
+      const payload = {
+        kind,
+        value: String(value).slice(0, 200),
+        page: location.href,
+        user_agent: navigator.userAgent,
+        session_id
+      };
+      const { error } = await supabase.from("responses").insert(payload);
+      if(error) console.warn("Supabase insert error:", error);
+    }catch(e){
+      console.warn("Supabase save failed:", e);
+    }
+  }
+
+  // ✅ diese Funktion global machen, damit dein vorhandenes Script sie nutzen kann
+  window.saveResponse = saveResponse;
+</script>
 </body>
 </html>
