@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Valentinsfrage (Paint-Edition)</title>
+  <style>
+    :root{
+      --paper:#fff8fb;
+      --ink:#1f1f1f;
+      --pink:#ff3f86;
+      --blue:#7aa7ff;
+      --lime:#79ffb2;
+      --card:#ffffffd6;
+      --shadow: 0 18px 60px rgba(0,0,0,.14);
+      --stroke: 3px;
+      --radius: 24px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--ink);
+      background:
+        radial-gradient(900px 650px at 20% 10%, #ffd1e6 0%, transparent 62%),
+        radial-gradient(900px 650px at 90% 20%, #d6e4ff 0%, transparent 58%),
+        radial-gradient(700px 500px at 50% 90%, #d7ffe8 0%, transparent 55%),
+        linear-gradient(135deg, #fff0f6, #f3f0ff);
+      overflow:hidden;
+    }
+
+    /* “Paint / paper” grain overlay */
+    .grain{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background-image:
+        repeating-linear-gradient(0deg, rgba(0,0,0,.018) 0px, rgba(0,0,0,.018) 1px, transparent 2px, transparent 4px),
+        repeating-linear-gradient(90deg, rgba(0,0,0,.014) 0px, rgba(0,0,0,.014) 1px, transparent 2px, transparent 5px);
+      mix-blend-mode:multiply;
+      opacity:.55;
+    }
+
+    /* SVG filter to make things a bit “wobbly / handdrawn” */
+    svg#filters{ position:absolute; width:0; height:0; }
+
+    .wrap{
+      min-height:100%;
+      display:grid;
+      place-items:center;
+      padding:18px;
+    }
+
+    .card{
+      width:min(920px, 95vw);
+      background:var(--card);
+      border-radius:var(--radius);
+      border: var(--stroke) solid rgba(0,0,0,.85);
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+      filter: url(#wobble);
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-60px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,63,134,.18), transparent 55%),
+        radial-gradient(circle at 80% 40%, rgba(122,167,255,.20), transparent 60%),
+        radial-gradient(circle at 50% 90%, rgba(121,255,178,.16), transparent 55%);
+      transform: rotate(-4deg);
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    header{
+      position:relative;
+      padding:18px 18px 0;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      z-index:1;
+    }
+
+    .tag{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding:10px 12px;
+      background:#fff;
+      border: var(--stroke) solid rgba(0,0,0,.85);
+      border-radius:999px;
+      font-weight:900;
+      box-shadow: 0 10px 22px rgba(0,0,0,.08);
+      transform: rotate(-.8deg);
+    }
+    .tag:nth-child(2){ transform: rotate(1.2deg); }
+
+    main{
+      position:relative;
+      z-index:1;
+      padding:10px 18px 18px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:16px;
+      align-items:stretch;
+    }
+    @media (max-width: 820px){
+      main{ grid-template-columns: 1fr; }
+    }
+
+    h1{
+      margin:10px 0 6px;
+      font-size: clamp(26px, 3.4vw, 44px);
+      line-height:1.05;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:0 0 12px;
+      opacity:.86;
+      font-size: clamp(14px, 1.8vw, 17px);
+    }
+
+    .panel{
+      background:#fff;
+      border: var(--stroke) solid rgba(0,0,0,.85);
+      border-radius: calc(var(--radius) - 6px);
+      padding:14px;
+      box-shadow: 0 14px 32px rgba(0,0,0,.09);
+      position:relative;
+      overflow:hidden;
+      transform: rotate(-.35deg);
+    }
+
+    .panel .scribble{
+      position:absolute;
+      inset:auto -40px -60px auto;
+      width:220px;
+      height:220px;
+      border: var(--stroke) dashed rgba(255,63,134,.55);
+      border-radius:40px;
+      transform: rotate(18deg);
+      opacity:.7;
+      pointer-events:none;
+    }
+
+    .copy{
+      font-size: 16px;
+      line-height:1.5;
+      margin:0;
+    }
+    .copy b{ color:var(--pink); }
+
+    .btns{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:12px;
+      align-items:center;
+    }
+
+    button{
+      border: var(--stroke) solid rgba(0,0,0,.85);
+      border-radius:999px;
+      padding:12px 16px;
+      font-weight:1000;
+      cursor:pointer;
+      background:#fff;
+      box-shadow: 0 12px 26px rgba(0,0,0,.12);
+      transition: transform .12s ease, filter .12s ease;
+      transform: rotate(.5deg);
+      user-select:none;
+    }
+    button:hover{ transform: translateY(-2px) rotate(-.5deg); }
+    button:active{ transform: translateY(0) rotate(.2deg) scale(.99); }
+
+    .yes{
+      background: linear-gradient(135deg, #ff3f86, #ff8bb0);
+      color:#fff;
+    }
+    .no{
+      background: linear-gradient(135deg, #e9eef7, #f7f7ff);
+      color:#1f2a3a;
+      position:relative;
+    }
+
+    .result{
+      margin-top:12px;
+      display:none;
+      padding:12px;
+      border-radius:18px;
+      border: var(--stroke) dashed rgba(0,0,0,.85);
+      background: #fff9fc;
+      transform: rotate(.4deg);
+    }
+    .result.show{ display:block; }
+    .result h2{ margin:0 0 6px; font-size: 20px; }
+    .result p{ margin:0; opacity:.86; }
+
+    /* Faces stage */
+    .stage{
+      background:#fff;
+      border: var(--stroke) solid rgba(0,0,0,.85);
+      border-radius: calc(var(--radius) - 6px);
+      padding:12px;
+      box-shadow: 0 14px 32px rgba(0,0,0,.09);
+      position:relative;
+      overflow:hidden;
+      transform: rotate(.35deg);
+      display:grid;
+      grid-template-rows: auto 1fr auto;
+      gap:10px;
+    }
+
+    .stageTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .mini{
+      font-size:13px;
+      opacity:.78;
+      font-weight:800;
+      padding:8px 10px;
+      border: var(--stroke) solid rgba(0,0,0,.85);
+      border-radius:999px;
+      background:#fff;
+      transform: rotate(-.6deg);
+    }
+
+    .faces{
+      position:relative;
+      display:grid;
+      place-items:center;
+      min-height:260px;
+    }
+
+    .face{
+      position:absolute;
+      width:150px;
+      height:150px;
+      border-radius: 26px;
+      border: var(--stroke) solid rgba(0,0,0,.9);
+      background:#fff;
+      overflow:hidden;
+      box-shadow: 0 18px 34px rgba(0,0,0,.12);
+      filter: url(#wobble);
+    }
+
+    .face img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      transform: scale(1.03);
+      image-rendering: auto;
+    }
+
+    .face.janek{
+      left: 10%;
+      top: 22%;
+      transform: rotate(-6deg);
+      animation: bob 2.2s ease-in-out infinite;
+    }
+    .face.carla{
+      right: 10%;
+      top: 22%;
+      transform: rotate(6deg);
+      animation: bob 2.4s ease-in-out infinite;
+      animation-delay:.1s;
+    }
+    @keyframes bob{
+      0%,100%{ translate: 0 0; }
+      50%{ translate: 0 -8px; }
+    }
+
+    /* Sketchy outline using pseudo elements */
+    .face::before{
+      content:"";
+      position:absolute;
+      inset:-7px;
+      border: 3px solid rgba(0,0,0,.85);
+      border-radius: 32px;
+      transform: rotate(1.2deg);
+      opacity:.55;
+      pointer-events:none;
+    }
+    .face::after{
+      content:"";
+      position:absolute;
+      inset:-11px;
+      border: 2px dashed rgba(255,63,134,.45);
+      border-radius: 36px;
+      transform: rotate(-1.4deg);
+      opacity:.55;
+      pointer-events:none;
+    }
+
+    /* Heart between faces */
+    .heartWrap{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      pointer-events:none;
+    }
+    .heart{
+      width:120px;
+      aspect-ratio:1;
+      position:relative;
+      transform: rotate(-10deg);
+      filter: drop-shadow(0 18px 26px rgba(255,63,134,.26)) url(#wobble);
+      animation: pulse 1.05s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%,100%{ transform: rotate(-10deg) scale(1); }
+      50%{ transform: rotate(8deg) scale(1.12); }
+    }
+    .heart:before, .heart:after{
+      content:"";
+      position:absolute;
+      width:62px; height:96px;
+      background: linear-gradient(135deg, #ff3f86, #ff9fbe);
+      border-radius: 62px 62px 0 0;
+      top:18px;
+      left:30px;
+      border: 3px solid rgba(0,0,0,.85);
+      box-shadow: 0 10px 18px rgba(0,0,0,.07);
+    }
+    .heart:before{
+      transform: rotate(-45deg);
+      transform-origin: 0 100%;
+    }
+    .heart:after{
+      transform: rotate(45deg);
+      transform-origin: 100% 100%;
+    }
+
+    /* Doodle particles */
+    .fx{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .p{
+      position:absolute;
+      font-size:18px;
+      will-change: transform, opacity;
+      animation: fall linear forwards;
+      filter: drop-shadow(0 10px 12px rgba(0,0,0,.08));
+      opacity:.95;
+    }
+    @keyframes fall{
+      0%{ transform: translateY(-40px) rotate(0deg); opacity:0; }
+      12%{ opacity:1; }
+      100%{ transform: translateY(110vh) rotate(520deg); opacity:0; }
+    }
+
+    /* silly toast */
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:14px;
+      transform: translateX(-50%);
+      background:#111;
+      color:#fff;
+      border: var(--stroke) solid rgba(255,255,255,.75);
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:900;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+      box-shadow: 0 18px 40px rgba(0,0,0,.25);
+      filter: url(#wobble);
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    /* small “screen bounce” on yes */
+    .bounce{
+      animation: screen 280ms ease-in-out 1;
+    }
+    @keyframes screen{
+      0%{ transform: translateY(0); }
+      40%{ transform: translateY(-6px); }
+      100%{ transform: translateY(0); }
+    }
+
+    /* Missing image note */
+    .missing{
+      display:none;
+      margin-top:8px;
+      padding:10px;
+      border-radius:16px;
+      border: var(--stroke) dashed rgba(0,0,0,.85);
+      background:#fff3f6;
+      font-weight:850;
+      opacity:.9;
+    }
+    .missing.show{ display:block; }
+  </style>
+</head>
+<body>
+  <!-- handdrawn-ish filter -->
+  <svg id="filters" aria-hidden="true">
+    <filter id="wobble">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="8" />
+      <feDisplacementMap in="SourceGraphic" scale="7" />
+    </filter>
+  </svg>
+
+  <div class="fx" id="fx" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <section class="card" id="card" aria-label="Valentinsfrage Paint Style">
+      <header>
+        <div class="tag">🖍️ Paint-Mode: AN</div>
+        <div class="tag">⚠️ Humor: leicht übertrieben</div>
+      </header>
+
+      <main>
+        <div class="panel">
+          <div class="scribble" aria-hidden="true"></div>
+          <h1>Carla, Valentinsdate? 🤝💘</h1>
+          <p class="sub">Keine Cringe-Rosen. Nur wir zwei, Snacks und sehr ernsthafte schlechte Witze.</p>
+
+          <p class="copy">
+            Hi Carla — ich hab eine Frage, die ich nur mit maximaler Paint-Ästhetik stellen konnte:
+            <br><b>Hast du Lust auf ein Date?</b>
+            <br><span style="opacity:.78;font-weight:800">Antwortmöglichkeiten: Ja / Ja aber mit Extra-Pommes.</span>
+          </p>
+
+          <div class="btns">
+            <button class="yes" id="yesBtn">JA 😎✨</button>
+            <button class="no" id="noBtn">Nein (ich bin stark)</button>
+          </div>
+
+          <div class="result" id="result">
+            <h2>Deal. 🤝💞</h2>
+            <p>
+              Offiziell: Das Universum hat kurz genickt.
+              Ich organisiere: Snacks. Du organisierst: Anwesenheit. (fair)
+            </p>
+          </div>
+
+          <div class="missing" id="missing">
+            ⚠️ Ich finde <code>janek.png</code> und/oder <code>carla.png</code> nicht.
+            Lege beide Dateien in denselben Ordner wie diese <code>index.html</code>.
+          </div>
+        </div>
+
+        <aside class="stage">
+          <div class="stageTop">
+            <div class="mini">📁 Erwartet: <b>janek.png</b> & <b>carla.png</b></div>
+            <div class="mini">💥 FX: Herzen, Kritzel, Sparkles</div>
+          </div>
+
+          <div class="faces" id="faces">
+            <div class="face janek"><img id="imgJanek" src="janek.png" alt="Janek" /></div>
+            <div class="heartWrap" aria-hidden="true"><div class="heart"></div></div>
+            <div class="face carla"><img id="imgCarla" src="carla.png" alt="Carla" /></div>
+          </div>
+
+          <div class="mini" style="justify-self:center; transform: rotate(.8deg);">
+            Tipp: Versuch “Nein” zu klicken — der Button hat Meinungen dazu.
+          </div>
+        </aside>
+      </main>
+    </section>
+  </div>
+
+  <div class="toast" id="toast">🧠 Fun fact: “Nein” ist heute im Energiesparmodus.</div>
+
+  <script>
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
+    const result = document.getElementById("result");
+    const toast  = document.getElementById("toast");
+    const fx     = document.getElementById("fx");
+    const card   = document.getElementById("card");
+    const missing = document.getElementById("missing");
+
+    const imgJanek = document.getElementById("imgJanek");
+    const imgCarla = document.getElementById("imgCarla");
+
+    // --- helper ---
+    const rand = (min,max)=> Math.random()*(max-min)+min;
+
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=> toast.classList.remove("show"), 2400);
+    }
+
+    // Particles = doodle emojis
+    function popFX(count=44){
+      const items = ["💖","💘","✨","🫶","🌸","🍟","🍓","⭐️","💥","🖍️"];
+      for(let i=0;i<count;i++){
+        const e = document.createElement("div");
+        e.className = "p";
+        e.textContent = items[(Math.random()*items.length)|0];
+        e.style.left = rand(0,100) + "vw";
+        e.style.top  = rand(-18,-6) + "vh";
+        e.style.fontSize = rand(14,28) + "px";
+        e.style.animationDuration = rand(2.6,5.0) + "s";
+        e.style.animationDelay = rand(0,0.25) + "s";
+        fx.appendChild(e);
+        e.addEventListener("animationend", ()=> e.remove());
+      }
+    }
+
+    function doYes(){
+      result.classList.add("show");
+      popFX(70);
+      yesBtn.textContent = "JA ✅ (bestimmt)";
+      yesBtn.disabled = true;
+
+      // make card bounce a tiny bit
+      card.classList.remove("bounce");
+      void card.offsetWidth;
+      card.classList.add("bounce");
+
+      // hide no after a beat (keeps it funny, not manipulative)
+      setTimeout(()=> { noBtn.style.opacity = .15; noBtn.style.pointerEvents="none"; }, 350);
+      showToast("💞 Mission accomplished. Snacks incoming.");
+    }
+
+    yesBtn.addEventListener("click", doYes);
+
+    // --- “No” button: lightly evasive + funny excuses ---
+    let flee = 0;
+    const excuses = [
+      "Nein (ich bin stark)",
+      "Nein (hab kurz WLAN)",
+      "Nein (muss meine Pflanze fragen)",
+      "Nein (bin ein Mythos)",
+      "Ok ok… vielleicht 😶",
+      "…JA?? 😳"
+    ];
+
+    function nudgeNo(){
+      flee++;
+      noBtn.textContent = excuses[Math.min(flee, excuses.length-1)];
+
+      // Move within panel bounds (so it stays catchable-ish)
+      const panel = document.querySelector(".panel");
+      const pr = panel.getBoundingClientRect();
+      const br = noBtn.getBoundingClientRect();
+
+      const pad = 10;
+      const maxX = pr.width - br.width - pad;
+      const maxY = pr.height - br.height - pad;
+
+      const x = Math.max(pad, Math.min(maxX, rand(pad, maxX)));
+      const y = Math.max(pad, Math.min(maxY, rand(110, maxY))); // keep it near buttons area
+
+      noBtn.style.position = "absolute";
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+      noBtn.style.zIndex = 4;
+
+      // small sprinkle fx sometimes
+      if (flee % 2 === 0) popFX(18);
+
+      // after enough attempts: flip to yes (as a joke)
+      if (flee >= 6) doYes();
+    }
+
+    noBtn.addEventListener("mouseenter", ()=> { if(flee>=1) nudgeNo(); });
+    noBtn.addEventListener("click", (e)=> { e.preventDefault(); nudgeNo(); });
+
+    // first hint
+    setTimeout(()=> showToast("🖍️ Tipp: Hover oder Klick auf “Nein” (wenn du dich traust)."), 800);
+
+    // --- image presence check ---
+    function checkImages(){
+      let okJ = false, okC = false;
+
+      imgJanek.addEventListener("load", ()=> { okJ = true; });
+      imgCarla.addEventListener("load", ()=> { okC = true; });
+
+      imgJanek.addEventListener("error", ()=> { okJ = false; missing.classList.add("show"); });
+      imgCarla.addEventListener("error", ()=> { okC = false; missing.classList.add("show"); });
+
+      // if both load, hide missing
+      setTimeout(()=>{
+        if (imgJanek.complete && imgCarla.complete &&
+            imgJanek.naturalWidth > 0 && imgCarla.naturalWidth > 0){
+          missing.classList.remove("show");
+          // gentle ambient fx
+          popFX(18);
+        } else {
+          missing.classList.add("show");
+        }
+      }, 700);
+    }
+    checkImages();
+
+    // ambient tiny sparkles
+    setInterval(()=> { if(!result.classList.contains("show")) popFX(6); }, 2800);
+  </script>
+</body>
+</html>
