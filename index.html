@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="de">
 <head>
@@ -33,7 +32,6 @@
       -webkit-overflow-scrolling: touch;
     }
 
-    /* “paper grain” overlay */
     .grain{
       position:fixed;
       inset:0;
@@ -65,8 +63,6 @@
       box-shadow: var(--shadow);
       position:relative;
       overflow:hidden;
-
-      /* ✅ change: NO backdrop blur so falling emojis stay crisp */
       backdrop-filter: none;
       filter: url(#wobble);
     }
@@ -83,12 +79,6 @@
       pointer-events:none;
     }
 
-    /* ====== CLEAR STACK ======
-       [ GIF ]
-       [ Text ]
-       [ Buttons ]
-       [ Heads ]
-    */
     main{
       position:relative;
       z-index:1;
@@ -98,7 +88,6 @@
       gap:12px;
     }
 
-    /* GIF top */
     .topRow{
       display:grid;
       place-items:center;
@@ -187,14 +176,10 @@
       background: linear-gradient(135deg, #ff3f86, #ff8bb0);
       color:#fff;
     }
-
     .maybe{
       background: linear-gradient(135deg, #fff3b0, #ffe08a);
       color:#222;
     }
-
-    /* ✅ change: NO button does NOT blink or disappear.
-       It will be gently nudged randomly by JS. */
     .no{
       background: linear-gradient(135deg, #e9eef7, #f7f7ff);
       color:#1f2a3a;
@@ -202,7 +187,6 @@
       will-change: transform;
     }
 
-    /* Runner mode on click (same as before) */
     .no.runner{
       position:absolute;
       left: 210px;
@@ -320,7 +304,6 @@
     }
     .picked.show{ display:block; }
 
-    /* Heads/Stage (bottom) */
     .stage{
       background:#fff;
       border: 2px solid rgba(0,0,0,.65);
@@ -342,7 +325,6 @@
       .faces{ min-height:270px; }
     }
 
-    /* Big background heart scribble (stronger) */
     .heartLink{
       position:absolute;
       inset:0;
@@ -388,7 +370,6 @@
       100% { stroke-dashoffset: -1600; opacity:.22; }
     }
 
-    /* Couple hug */
     .couple{
       position:relative;
       width:min(520px, 96%);
@@ -415,7 +396,6 @@
     .stick.left{ left: 2%; }
     .stick.right{ right: 2%; }
 
-    /* Cutout heads: smaller, no border */
     .face{
       width: clamp(68px, 18vw, 104px);
       height: clamp(68px, 18vw, 104px);
@@ -451,7 +431,6 @@
       stroke-linejoin:round;
     }
 
-    /* Arms hug animation: open -> wrap -> open */
     .armL, .armR{ transform-box: fill-box; transform-origin: 50% 10%; }
     .left .armR{ animation: hugArmIn 2.6s ease-in-out infinite; }
     .left .armL{ animation: hugArmOut 2.6s ease-in-out infinite; }
@@ -468,7 +447,6 @@
       50%{ transform: rotate(10deg) translate(-6px, 4px); opacity:.85; }
     }
 
-    /* Mini heart focus */
     .miniHeart{
       position:absolute;
       left:50%;
@@ -501,7 +479,6 @@
       display:inline-block;
     }
 
-    /* Doodle particles (should be visible!) */
     .fx{
       position:fixed;
       inset:0;
@@ -523,7 +500,6 @@
       100%{ transform: translateY(110vh) rotate(520deg); opacity:0; }
     }
 
-    /* toast */
     .toast{
       position:fixed;
       left:50%;
@@ -548,7 +524,6 @@
       transform: translateX(-50%) translateY(-4px);
     }
 
-    /* Sound button (optional) */
     .soundBtn{
       position:fixed;
       right: 12px;
@@ -578,7 +553,6 @@
   <div class="fx" id="fx" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
 
-  <!-- optional music: put song.mp3 next to index.html -->
   <audio id="bgm" src="song.mp3" preload="auto" loop></audio>
   <button class="soundBtn" id="soundBtn" aria-label="Sound einschalten">🔊 Sound</button>
 
@@ -586,12 +560,10 @@
     <section class="card" id="card" aria-label="Valentinsfrage Paint Style">
       <main>
 
-        <!-- [ GIF ] -->
         <div class="topRow">
           <img class="topGif" src="top.gif" alt="gif" />
         </div>
 
-        <!-- [ Text + Buttons ] -->
         <div class="panel">
           <div class="scribble" aria-hidden="true"></div>
 
@@ -603,12 +575,9 @@
             <br><b>Hast du Lust auf ein Date?</b>
           </p>
 
-          <!-- [ Buttons ] -->
           <div class="btns" id="btns">
             <button class="yes" id="yesBtn">JA 😎✨</button>
-
             <button class="maybe" id="maybeBtn">Vielleicht 🤔</button>
-
             <button class="no" id="noBtn">
               Nein (ich bin stark)
               <span class="legs" aria-hidden="true">
@@ -618,7 +587,6 @@
             </button>
           </div>
 
-          <!-- Vielleicht: Input -->
           <div class="result" id="resultMaybe">
             <h2>👀 vielleicht ist auch ein ja</h2>
             <p>Was wäre dein “Vielleicht”-Gedanke?</p>
@@ -629,7 +597,6 @@
             <div class="picked" id="maybeSaved"></div>
           </div>
 
-          <!-- YES -->
           <div class="result" id="resultYes">
             <h2>juhu 🤝💞</h2>
             <p>Wähle Aktivität an Gemeinsamkeit:</p>
@@ -649,7 +616,6 @@
             <div class="picked" id="picked"></div>
           </div>
 
-          <!-- NO -->
           <div class="result" id="resultNo">
             <h2>😔 Okay…</h2>
             <p>Trag hier deine Ausrede ein:</p>
@@ -661,7 +627,6 @@
           </div>
         </div>
 
-        <!-- [ Heads ] -->
         <aside class="stage">
           <div class="faces" id="faces">
 
@@ -683,37 +648,25 @@
             <div class="couple" id="couple">
               <div class="miniHeart" aria-hidden="true">💖</div>
 
-              <!-- Left stick (Janek) -->
               <div class="stick left" id="stickJanek">
                 <div class="face" id="faceJanek"><img id="imgJanek" src="janek kopf.png" alt="Janek" /></div>
                 <svg class="man" viewBox="0 0 240 170" aria-hidden="true">
                   <line x1="120" y1="12" x2="120" y2="98"></line>
                   <line x1="120" y1="98" x2="92" y2="152"></line>
                   <line x1="120" y1="98" x2="148" y2="152"></line>
-
-                  <g class="armL">
-                    <path d="M120 44 Q 92 58 70 82"></path>
-                  </g>
-                  <g class="armR">
-                    <path d="M120 44 Q 168 62 206 92"></path>
-                  </g>
+                  <g class="armL"><path d="M120 44 Q 92 58 70 82"></path></g>
+                  <g class="armR"><path d="M120 44 Q 168 62 206 92"></path></g>
                 </svg>
               </div>
 
-              <!-- Right stick (Carla) -->
               <div class="stick right" id="stickCarla">
                 <div class="face" id="faceCarla"><img id="imgCarla" src="carla kopf.png" alt="Carla" /></div>
                 <svg class="man" viewBox="0 0 240 170" aria-hidden="true">
                   <line x1="120" y1="12" x2="120" y2="98"></line>
                   <line x1="120" y1="98" x2="92" y2="152"></line>
                   <line x1="120" y1="98" x2="148" y2="152"></line>
-
-                  <g class="armL">
-                    <path d="M120 44 Q 70 62 34 92"></path>
-                  </g>
-                  <g class="armR">
-                    <path d="M120 44 Q 150 58 174 82"></path>
-                  </g>
+                  <g class="armL"><path d="M120 44 Q 70 62 34 92"></path></g>
+                  <g class="armR"><path d="M120 44 Q 150 58 174 82"></path></g>
                 </svg>
               </div>
             </div>
@@ -729,11 +682,44 @@
 
   <div class="toast" id="toast">🧠 Tipp: Nicht “Nein” klicken. Wirklich nicht.</div>
 
+  <!-- ✅ Supabase FIRST (module) -->
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+    // TODO: set these
+    const SUPABASE_URL = "https://DEIN-PROJEKT.supabase.co";
+    const SUPABASE_KEY = "DEIN_ANON_ODER_PUBLISHABLE_KEY";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const SESSION_KEY = "val_session_id";
+    const session_id = localStorage.getItem(SESSION_KEY) || crypto.randomUUID();
+    localStorage.setItem(SESSION_KEY, session_id);
+
+    async function saveResponse(kind, value){
+      try{
+        const payload = {
+          kind,
+          value: String(value).slice(0, 200),
+          page: location.href,
+          user_agent: navigator.userAgent,
+          session_id
+        };
+        const { error } = await supabase.from("responses").insert(payload);
+        if(error) console.warn("Supabase insert error:", error);
+      }catch(e){
+        console.warn("Supabase save failed:", e);
+      }
+    }
+
+    window.saveResponse = saveResponse;
+  </script>
+
+  <!-- ✅ App logic -->
   <script>
     const yesBtn = document.getElementById("yesBtn");
     const maybeBtn = document.getElementById("maybeBtn");
     const noBtn  = document.getElementById("noBtn");
-    const btns   = document.getElementById("btns");
 
     const resultYes = document.getElementById("resultYes");
     const resultNo  = document.getElementById("resultNo");
@@ -762,7 +748,6 @@
     const faceJanek = document.getElementById("faceJanek");
     const faceCarla = document.getElementById("faceCarla");
 
-    // audio (optional)
     const bgm = document.getElementById("bgm");
     const soundBtn = document.getElementById("soundBtn");
     let soundOn = false;
@@ -826,14 +811,12 @@
       resultMaybe.classList.remove("show");
     }
 
-    // ✅ NEW: random nudge for NO button (no blinking, no disappearing)
-    // It stays within the button area, looks "nervous".
+    // random nudge for NO button
     let noNudgeTimer = null;
     let noOffset = {x:0, y:0};
 
     function nudgeNo(){
-      if(noBtn.classList.contains("runner")) return; // don't interfere when running
-      // small random step
+      if(noBtn.classList.contains("runner")) return;
       const dx = rand(-10, 10);
       const dy = rand(-6, 6);
 
@@ -841,13 +824,12 @@
       noOffset.y = Math.max(-10, Math.min(10, noOffset.y + dy));
 
       noBtn.style.transform = `translate(${noOffset.x}px, ${noOffset.y}px) rotate(${rand(-1.2,1.2)}deg)`;
-      // schedule next nudge irregularly
       clearTimeout(noNudgeTimer);
       noNudgeTimer = setTimeout(nudgeNo, rand(450, 1200));
     }
     nudgeNo();
 
-    // YES flow
+    // YES
     function doYes(){
       tryStartMusic();
       hideAllResults();
@@ -856,19 +838,17 @@
       proposalRow.classList.remove("show");
       popFX(70);
       boopFaces();
-      card.classList.remove("boop");
-      void card.offsetWidth;
-      card.classList.add("boop");
 
       yesBtn.disabled = true;
       maybeBtn.disabled = true;
       noBtn.disabled = true;
 
       showToast("✅ Ja registriert. Jetzt wird geplant.");
+      if (window.saveResponse) window.saveResponse("yes", "JA");
     }
     yesBtn.addEventListener("click", doYes);
 
-    // MAYBE flow
+    // MAYBE
     function doMaybe(){
       tryStartMusic();
       hideAllResults();
@@ -876,161 +856,4 @@
       maybeSaved.classList.remove("show");
       maybeSaved.textContent = "";
       popFX(22);
-      boopFaces();
-      setTimeout(()=> maybeInput.focus(), 250);
-      showToast("🤔 okay. sag’s ehrlich.");
-    }
-    maybeBtn.addEventListener("click", doMaybe);
-
-    saveMaybe.addEventListener("click", ()=>{
-      tryStartMusic();
-      const v = (maybeInput.value || "").trim();
-      if(!v){
-        showToast("✍️ kurz reinschreiben");
-        maybeInput.focus();
-        return;
-      }
-      maybeSaved.textContent = "Vielleicht-Notiz gespeichert: „" + v + "“ ✅";
-      maybeSaved.classList.add("show");
-      popFX(18);
-      boopFaces();
-      showToast("✅ verstanden");
-    });
-    maybeInput.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter") saveMaybe.click();
-    });
-
-    // choices
-    choices.addEventListener("click", (e)=>{
-      tryStartMusic();
-      const btn = e.target.closest("button[data-choice]");
-      if(!btn) return;
-      const choice = btn.dataset.choice;
-
-      if (choice.includes("Dein Vorschlag")) {
-        proposalRow.classList.add("show");
-        proposalInput.value = "";
-        proposalInput.focus();
-        picked.classList.remove("show");
-        popFX(16);
-        boopFaces();
-        showToast("✨ okay, freestyle!");
-        return;
-      }
-
-      proposalRow.classList.remove("show");
-      picked.textContent = "Auswahl gespeichert: " + choice + " ✅";
-      picked.classList.add("show");
-      popFX(22);
-      boopFaces();
-      showToast("🗓️ " + choice + " klingt verdächtig gut.");
-    });
-
-    saveProposal.addEventListener("click", ()=>{
-      tryStartMusic();
-      const v = (proposalInput.value || "").trim();
-      if(!v){
-        showToast("✍️ schreib kurz deinen vorschlag rein");
-        proposalInput.focus();
-        return;
-      }
-      picked.textContent = "Auswahl gespeichert: ✨ " + v + " ✅";
-      picked.classList.add("show");
-      proposalRow.classList.remove("show");
-      popFX(22);
-      boopFaces();
-      showToast("✅ gespeichert");
-    });
-    proposalInput.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter") saveProposal.click();
-    });
-
-    // NO flow: runner + excuse input
-    let noStarted = false;
-    function doNo(){
-      tryStartMusic();
-      if (noStarted) return;
-      noStarted = true;
-
-      clearTimeout(noNudgeTimer); // stop nudging
-      noBtn.classList.add("runner");
-      noBtn.disabled = true;
-      yesBtn.disabled = true;
-      maybeBtn.disabled = true;
-
-      hideAllResults();
-      resultNo.classList.add("show");
-      inputRow.classList.add("show");
-      excuseSaved.classList.remove("show");
-      excuseSaved.textContent = "";
-      popFX(18);
-      boopFaces();
-
-      showToast("🏃‍♂️ Nein hat Beine bekommen. Verdächtig.");
-      setTimeout(()=> excuseInput.focus(), 450);
-    }
-    noBtn.addEventListener("click", (e)=>{ e.preventDefault(); doNo(); });
-
-    saveExcuse.addEventListener("click", ()=>{
-      tryStartMusic();
-      const v = (excuseInput.value || "").trim();
-      if(!v){
-        showToast("✍️ Bitte eine Ausrede eintragen (sie darf peinlich sein).");
-        excuseInput.focus();
-        return;
-      }
-      excuseSaved.textContent = "Ausrede archiviert: „" + v + "“ ✅";
-      excuseSaved.classList.add("show");
-      popFX(18);
-      boopFaces();
-      showToast("📁 Gespeichert. Für immer.");
-    });
-    excuseInput.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter") saveExcuse.click();
-    });
-
-    setTimeout(()=> showToast("🖍️ Tipp: Versuch nicht “Nein” zu klicken."), 900);
-
-    // Ambient subtle FX
-    setInterval(()=> {
-      if(!resultYes.classList.contains("show") &&
-         !resultNo.classList.contains("show") &&
-         !resultMaybe.classList.contains("show")){
-        popFX(6);
-      }
-    }, 2800);
-  </script>
-  <script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
-  const SUPABASE_URL = "https://DEIN-PROJEKT.supabase.co";
-  const SUPABASE_KEY = "DEIN_ANON_ODER_PUBLISHABLE_KEY";
-
-  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  // einfache session id pro Gerät/Browser
-  const SESSION_KEY = "val_session_id";
-  const session_id = localStorage.getItem(SESSION_KEY) || crypto.randomUUID();
-  localStorage.setItem(SESSION_KEY, session_id);
-
-  async function saveResponse(kind, value){
-    try{
-      const payload = {
-        kind,
-        value: String(value).slice(0, 200),
-        page: location.href,
-        user_agent: navigator.userAgent,
-        session_id
-      };
-      const { error } = await supabase.from("responses").insert(payload);
-      if(error) console.warn("Supabase insert error:", error);
-    }catch(e){
-      console.warn("Supabase save failed:", e);
-    }
-  }
-
-  // ✅ diese Funktion global machen, damit dein vorhandenes Script sie nutzen kann
-  window.saveResponse = saveResponse;
-</script>
-</body>
-</html>
+      boop
